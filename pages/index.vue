@@ -17,19 +17,47 @@
           target="_blank"
           class="button--grey"
         >
-          GitHub
+          GitHubs
         </a>
       </div>
+      <h1>{{ restaurant.restaurant }}</h1>
+
+      <VueShowdown
+        v-if="restaurant.description"
+        :markdown="restaurant.description"
+      />
     </div>
   </div>
 </template>
 
 <script>
+import axios from 'axios'
 import Logo from '~/components/Logo.vue'
 
 export default {
   components: {
     Logo
+  },
+  data() {
+    return {
+      restaurant: {}
+    }
+  },
+  async mounted() {
+    const { data } = await axios({
+      url: 'https://still-journey-60454.herokuapp.com/graphql',
+      method: 'post',
+      data: {
+        query: `
+          {restaurants {
+            id
+            restaurant
+            description
+          } }`
+      }
+    })
+
+    this.restaurant = data.data.restaurants[0]
   }
 }
 </script>
