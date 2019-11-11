@@ -1,46 +1,51 @@
 <template>
   <div class="container">
     <div>
-      <logo />
-      <h1 class="title">
-        first-strapi-project
-      </h1>
-      <h2 class="subtitle">
-        Trying out Strapi with Nuxt front end
-      </h2>
-      <div class="links">
-        <a href="https://nuxtjs.org/" target="_blank" class="button--green">
-          Documentation
-        </a>
-        <a
-          href="https://github.com/nuxt/nuxt.js"
-          target="_blank"
-          class="button--grey"
+      <div class="columns">
+        <div
+          v-for="restaurant in restaurants"
+          :key="restaurant.id"
+          class="column is-one-third"
         >
-          GitHubs
-        </a>
-      </div>
-      <h1>{{ restaurant.restaurant }}</h1>
+          <nuxt-link
+            :to="
+              `/restaurant/${restaurant.id}-${slugify(restaurant.restaurant)}`
+            "
+            class="card"
+          >
+            <div class="card-image">
+              <figure class="image is-4by3">
+                <img
+                  v-if="restaurant.hero_image"
+                  :src="restaurant.hero_image.url"
+                  alt="Placeholder image"
+                />
+              </figure>
+            </div>
+            <div class="card-content">
+              <p class="title is-4">{{ restaurant.restaurant }}</p>
 
-      <VueShowdown
-        v-if="restaurant.description"
-        :markdown="restaurant.description"
-      />
+              <div class="content">
+                <VueShowdown
+                  v-if="restaurant.description"
+                  :markdown="restaurant.description"
+                />
+              </div>
+            </div>
+          </nuxt-link>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
 import axios from 'axios'
-import Logo from '~/components/Logo.vue'
 
 export default {
-  components: {
-    Logo
-  },
   data() {
     return {
-      restaurant: {}
+      restaurants: {}
     }
   },
   async mounted() {
@@ -52,12 +57,34 @@ export default {
           {restaurants {
             id
             restaurant
+            created_at
             description
+            hero_image {
+              url
+            }
           } }`
       }
     })
 
-    this.restaurant = data.data.restaurants[0]
+    this.restaurants = data.data.restaurants
+  },
+  methods: {
+    slugify(string) {
+      const a = 'àáäâãåèéëêìíïîòóöôùúüûñçßÿœæŕśńṕẃǵǹḿǘẍźḧ·/_,:;'
+      const b = 'aaaaaaeeeeiiiioooouuuuncsyoarsnpwgnmuxzh------'
+      const p = new RegExp(a.split('').join('|'), 'g')
+
+      return string
+        .toString()
+        .toLowerCase()
+        .replace(/\s+/g, '-') // Replace spaces with
+        .replace(p, (c) => b.charAt(a.indexOf(c))) // Replace special characters
+        .replace(/&/g, '-and-') // Replace & with ‘and’
+        .replace(/[^\w-]+/g, '') // Remove all non-word characters
+        .replace(/--+/g, '-') // Replace multiple — with single -
+        .replace(/^-+/, '') // Trim — from start of text
+        .replace(/-+$/, '') // Trim — from end of text
+    }
   }
 }
 </script>
