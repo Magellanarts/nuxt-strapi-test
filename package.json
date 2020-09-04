@@ -19,7 +19,7 @@
     "node-sass": "^4.12.0",
     "nuxt": "^2.0.0",
     "sass-loader": "^7.3.1",
-    "showdown": "^1.9.0",
+    "showdown": "^1.9.1",
     "vue-markdown": "^2.2.4",
     "vue-showdown": "^2.4.1"
   },
